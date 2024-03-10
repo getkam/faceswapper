@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Mimic
+{% endblock %}
+
+{% block main %}
+<div class="grid-container">
+  <div class="grid-item">
+    <h5 class="display-4 text-center">Target picture</h5>
+    <p>Picture with face or faces you want to replace with source face</p>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+      <input type="file" name="target" id="target-file" multiple>
+      <button type="submit" class="btn bg-light text-dark">Upload</button>
+    </form>
+  </div>
+  <div class="grid-item">
+    <h5 class="display-4 text-center">Source picture</h5>
+    <p>Picture of face you want to use on target picture</p>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+      <input type="file" name="source" id="source-file" multiple>
+      <button type="submit" class="btn bg-light text-dark">Upload</button>
+    </form>
+  </div>
+</div>
+
+  <form id="swap" action="/swap" method="post">
+    <div class="grid-container">
+      {% if session.get('target_img') or  session.get('source_img') %}
+      <div class="grid-item">
+        <h5>Preview of target</h5>
+          {% if target_img %}
+          <img src="{{ target_img }}" id="target_preview" alt="Target image">
+          {% endif %}
+      </div>
+      <div class="grid-item">
+        <h5>Preview of source</h5>
+          {% if source_img %}
+          <img src="{{ source_img }}" id="source_preview"  alt="Source image">
+          {% endif %}
+      </div>
+      <div class="grid-item">
+        <h5>Recognized faces from target</h5>
+        <p>Select face you want to have changed</p>
+          {% if target_faces %}
+          <div class="radio-img" id="radio-target-faces">
+            {% for idx, face in enumerate(target_faces) %}
+              <input type="radio" name="target_face" value="{{ idx }}">
+              <img src='{{ face }}' alt='Face' width='30' height=auto>
+            {% endfor %}
+          </div>
+          {% endif %}
+      </div>
+      <div class="grid-item">
+        <h5>Recognized faces from source</h5>
+        <p>Select face you want to use to swap</p>
+        {% if source_faces %}
+        <div class="radio-img" id="radio-target-faces">
+          {% for idx, face in enumerate(source_faces) %}
+            <input type="radio" name="source_face" value="{{ idx }}">
+            <img src='{{ face }}' alt='Face' width='30' height='auto'>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <br/>
+      <div class="container text-center">
+        <button class="btn btn-block bg-light text-dark btn-lg" type="submit" form="swap" value="Submit">Swap</button>
+      </div>
+   
+    {% endif %}
+    </div>
+  </form>
+
+{% endblock %}

@@ -1,77 +1,100 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Mimic
+Face swapper
 {% endblock %}
 
 {% block main %}
+{% if error %}
+<div class="alert alert-warning" role="alert">
+  {{ error }}
+</div>
+{% endif %}
+
 <div class="grid-container">
   <div class="grid-item">
     <h5 class="display-4 text-center">Target picture</h5>
     <p>Picture with face or faces you want to replace with source face</p>
     <form action="/upload" method="post" enctype="multipart/form-data">
-      <input type="file" name="target" id="target-file" multiple>
-      <button type="submit" class="btn bg-light text-dark">Upload</button>
+      <input type="file" name="target" id="target-file" onchange="uploadFile(this)" accept="image/jpg image/png">
     </form>
   </div>
   <div class="grid-item">
     <h5 class="display-4 text-center">Source picture</h5>
     <p>Picture of face you want to use on target picture</p>
     <form action="/upload" method="post" enctype="multipart/form-data">
-      <input type="file" name="source" id="source-file" multiple>
-      <button type="submit" class="btn bg-light text-dark">Upload</button>
+      <input type="file" name="source" id="source-file" onchange="uploadFile(this)" accept="image/jpg image/png">
     </form>
   </div>
 </div>
 
-  <form id="swap" action="/swap" method="post">
-    <div class="grid-container">
-      {% if session.get('target_img') or  session.get('source_img') %}
-      <div class="grid-item">
-        <h5>Preview of target</h5>
-          {% if target_img %}
-          <img src="{{ target_img }}" id="target_preview" alt="Target image">
-          {% endif %}
-      </div>
-      <div class="grid-item">
-        <h5>Preview of source</h5>
-          {% if source_img %}
-          <img src="{{ source_img }}" id="source_preview"  alt="Source image">
-          {% endif %}
-      </div>
-      <div class="grid-item">
-        <h5>Recognized faces from target</h5>
-        <p>Select face you want to have changed</p>
-          {% if target_faces %}
-          <div class="radio-img" id="radio-target-faces">
-            {% for idx, face in enumerate(target_faces) %}
-              <input type="radio" name="target_face" value="{{ idx }}">
-              <img src='{{ face }}' alt='Face' width='30' height=auto>
-            {% endfor %}
-          </div>
-          {% endif %}
-      </div>
-      <div class="grid-item">
-        <h5>Recognized faces from source</h5>
-        <p>Select face you want to use to swap</p>
-        {% if source_faces %}
-        <div class="radio-img" id="radio-target-faces">
-          {% for idx, face in enumerate(source_faces) %}
-            <input type="radio" name="source_face" value="{{ idx }}">
-            <img src='{{ face }}' alt='Face' width='30' height='auto'>
-          {% endfor %}
-        </div>
-        {% endif %}
-      </div>
-    </div>
 
-    <br/>
-      <div class="container text-center">
-        <button class="btn btn-block bg-light text-dark btn-lg" type="submit" form="swap" value="Submit">Swap</button>
-      </div>
-   
+<div class="grid-container">
+  {% if session.get('target_img') or session.get('source_img') %}
+  <div class="grid-item">
+    <h5>Preview of target</h5>
+    {% if session.get('target_img') %}
+    <img src="{{ session.get('target_img') }}" id="target_preview" alt="Target image">
     {% endif %}
+  </div>
+  <div class="grid-item">
+    <h5>Preview of source</h5>
+    {% if session.get('source_img') %}
+    <img src="{{ session.get('source_img') }}" id="source_preview" alt="Source image">
+    {% endif %}
+  </div>
+  <div class="grid-item">
+    <h5>Recognized faces from target</h5>
+    {% if session.get('target_faces') %}
+    <p>Select face you want to have changed</p>
+    <div class="flex-container">
+      {% for idx, face in enumerate(session.get('target_faces')) %}
+      {% if idx == 0 %}
+      <img src='{{ face }}' alt='Face' onclick="selectItem(this)" class="target-face selected-img"
+        data-value="{{ idx }}">
+      {% else %}
+      <img src='{{ face }}' alt='Face' onclick="selectItem(this)" class="target-face" data-value="{{ idx }}">
+      {% endif %}
+      {% endfor %}
     </div>
-  </form>
-
+    {% else %}
+    <p>No faces found</p>
+    {% endif %}
+  </div>
+  <div class="grid-item">
+    <h5>Recognized faces from source</h5>
+    {% if session.get('source_faces') %}
+    <p>Select face you want to use to swap</p>
+    <div class="flex-container">
+      {% for idx, face in enumerate(session.get('source_faces')) %}
+      {% if idx == 0 %}
+      <img src='{{ face }}' alt='Face' onclick="selectItem(this)" class="source-face selected-img"
+        data-value="{{ idx }}">
+      {% else %}
+      <img src='{{ face }}' alt='Face' onclick="selectItem(this)" class="source-face" data-value="{{ idx }}">
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% else %}
+    <p>No faces found</p>
+    {% endif %}
+  </div>
+</div>
+{% if session.get('target_faces') and session.get('source_faces') %}
+<form id="swap" action="/swap" method="post">
+  <br />
+  <div class="container text-center">
+    <input type="hidden" name="selected_target_face" id="selected_target_face" value="0">
+    <input type="hidden" name="selected_source_face" id="selected_source_face" value="0">
+    <button class="btn btn-block bg-light text-dark btn-lg" type="submit" form="swap" value="Submit">Swap</button>
+  </div>
+</form>
+{% else %}
+<div class="container text-center">
+  <br />
+  <button class="btn btn-block bg-light text-dark btn-lg" type="submit" form="swap" value="Submit"
+    disabled>Swap</button>
+  {% endif %}
+  {% endif %}
+</div>
 {% endblock %}

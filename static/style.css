@@ -22,22 +22,32 @@ body{
   height: auto;
 }
 
-.radio-img {
+.grid-result img{
   display: flex;
   flex-direction: column;
-  margin: 10;
-  width: 150px;
-  height: auto;
-}
-.radio-img img {
-  width: 100%;
-  height: auto;
-  border: 1px solid #000000;
-  margin-bottom: 10px;
+  justify-content: center;
+  text-align: center;
+  margin: 40px;
+  border: 2px solid #f6f8f6;
 }
 
-.grid-result {
-  display: grid;
-  grid-template-columns: 1fr;
-  justify-content: center;
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+}
+
+.flex-container img {
+  width: 100px;
+  height: auto;
+  margin: 10px;
+  border: 1px solid #000000;
+}
+.flex-container img:hover {
+  cursor: pointer;
+  border: 1px solid #949594;
+}
+
+.flex-container img.selected-img {
+  border: 2px solid #f6f8f6;
 }

@@ -1,14 +1,16 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Mimic
+    Face swapper
 {% endblock %}
 
 {% block main %}
   <div class="grid-result">
     <h2 class="display-4 text-center" style="color: #ccc;">Swapped picture</h2>
+      <img src="{{ session['result_img'] }}" class="img-fluid" id="result_preview" alt="Result image">
 
-      <img src="{{ result_img }}" class="img-fluid" id="result_preview" alt="Result image">
-      
+      <form action="/clear" methon="post">
+        <button type="submit" class="btn btn-primary text-center">Clear my data</button>
+      </form>
   </div>
 {% endblock %}

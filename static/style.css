@@ -27,6 +27,7 @@ body{
   flex-direction: column;
   justify-content: center;
   text-align: center;
+  width: 90%;
   margin: 40px;
   border: 2px solid #f6f8f6;
 }
@@ -50,4 +51,8 @@ body{
 
 .flex-container img.selected-img {
   border: 2px solid #f6f8f6;
+}
+
+.bottom-margin {
+  margin-bottom: 50px;
 }

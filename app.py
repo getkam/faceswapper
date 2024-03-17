@@ -126,7 +126,7 @@ def swap():
       return render_template('index.html')
    
 
-@app.route('/clear', methods=['GET'])
+@app.route('/clear', methods=['POST'])
 def clear():
     # Clear the session and remove the files
     if 'target_img' in session:

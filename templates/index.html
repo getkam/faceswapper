@@ -28,7 +28,6 @@ Face swapper
   </div>
 </div>
 
-
 <div class="grid-container">
   {% if session.get('target_img') or session.get('source_img') %}
   <div class="grid-item">
@@ -81,20 +80,21 @@ Face swapper
   </div>
 </div>
 {% if session.get('target_faces') and session.get('source_faces') %}
-<form id="swap" action="/swap" method="post">
-  <br />
-  <div class="container text-center">
-    <input type="hidden" name="selected_target_face" id="selected_target_face" value="0">
-    <input type="hidden" name="selected_source_face" id="selected_source_face" value="0">
-    <button class="btn btn-block bg-light text-dark btn-lg" type="submit" form="swap" value="Submit">Swap</button>
-  </div>
-</form>
+  <form id="swap" action="/swap" method="post">
+    <br />
+    <div class="container text-center">
+      <input type="hidden" name="selected_target_face" id="selected_target_face" value="0">
+      <input type="hidden" name="selected_source_face" id="selected_source_face" value="0">
+      <button class="btn btn-block bg-light text-dark btn-lg" type="submit" form="swap" value="Submit">Swap</button>
+    </div>
+  </form>
 {% else %}
-<div class="container text-center">
-  <br />
-  <button class="btn btn-block bg-light text-dark btn-lg" type="submit" form="swap" value="Submit"
-    disabled>Swap</button>
-  {% endif %}
-  {% endif %}
-</div>
+  <div class="container text-center">
+    <br />
+    <button class="btn btn-block bg-light text-dark btn-lg bottom-margin" type="submit" form="swap" value="Submit"
+      disabled>Swap</button>
+  </div>
+{% endif %}
+
+{% endif %}
 {% endblock %}

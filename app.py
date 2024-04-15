@@ -7,6 +7,10 @@ import cv2
 import matplotlib.pyplot as plt
 from jinja2 import Environment
 import helper
+from helper import login_required
+import sqlite3
+import re
+import bcrypt
 
 import insightface 
 from insightface.app import FaceAnalysis
@@ -33,7 +37,93 @@ def index():
     session.clear()
     return render_template('index.html')
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    """Log user in"""
+
+    # Forget any user_id
+    session.clear()
+
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+        username = request.form.get("username")
+        # Ensure username was submitted
+        if not username:
+            return render_template("apology.html", message="User name must be provided")
+
+        # Ensure password was submitted
+        elif not request.form.get("password"):
+            return render_template("apology.html", message="Password must be provided")
+        with sqlite3.connect('faceswapper.db') as conn:
+            # Ustawienie row_factory na sqlite3.Row
+            conn.row_factory = sqlite3.Row  
+            db = conn.cursor()
+            # Query database for username
+            row = db.execute("SELECT id, hash FROM users WHERE username = ?", [username]).fetchone()
+            # Ensure username exists and password is correct
+            if row is None:
+                return render_template("apology.html", message="Invalid username. Please try again.")
+            provided_password = request.form.get("password").encode('utf-8')
+            hashed_password = row["hash"]
+            if not bcrypt.checkpw(provided_password, hashed_password):
+                return render_template("apology.html", message="Invalid password. Please try again.")
+
+            # Remember which user has logged in
+            session["user_id"] = row["id"]
+
+            # Redirect user to home page
+            return redirect("/")
+
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("login.html")
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    """Register user"""
+    if request.method == "POST":
+      with sqlite3.connect('faceswapper.db') as conn:
+        db = conn.cursor()
+        username = request.form.get("username")
+        print(username)
+        if not username:
+            return render_template("apology.html", message="Username must be provided")
+        userDB = db.execute("SELECT * FROM users WHERE username = ?", [username]).fetchall()
+        if len(userDB) != 0:
+            return render_template("apology.html", message="Username already exists")
+
+        password = request.form.get("password")
+        if len(password) < 5 or not re.search(r"[a-z]", password) or not re.search(r"[\d]", password):
+            return render_template("apology.html", message="Password must be at least 5 characters long and contain at least one number and one letter")
+
+        confirmation = request.form.get("confirmation")
+        if password != confirmation:
+            return render_template("apology.html", message="Passwords do not match")
+        password_bytes = password.encode('utf-8')
+        print(password_bytes)
+        hashed = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+        print(hashed)
+        db.execute("INSERT INTO users (username, hash) VALUES (?,?)", (username,hashed)
+        )
+        return redirect("/")
+    if request.method == "GET":
+        return render_template("signup.html")
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    """Log user out"""
+
+    # Forget any user_id
+    session.clear()
+
+    # Redirect user to login form
+    return redirect("/")
+
+
 @app.route('/upload', methods=['POST'])
+@login_required
 def upload():
   if request.method == "POST":
 
@@ -90,6 +180,7 @@ def upload():
 
 
 @app.route('/swap', methods=['POST'])
+@login_required
 def swap():
    if request.method == "POST":
       if 'target_img' in session and 'source_img' in session:
@@ -127,6 +218,7 @@ def swap():
    
 
 @app.route('/clear', methods=['POST'])
+@login_required
 def clear():
     # Clear the session and remove the files
     if 'target_img' in session:

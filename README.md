@@ -41,3 +41,23 @@ CREATE TABLE users (
     hash TEXT NOT NULL
 );
 ```
+## Running the Application
+
+### Activate the Virtual Environment
+To isolate our package dependencies locally, create a virtual environment:
+```
+python -m venv venv
+source venv/bin/activate  
+# On Windows use `venv\Scripts\activate`
+```
+### Start the Flask Application
+With the virtual environment activated and dependencies installed, you can start the Flask application:
+
+```
+flask run
+```
+The application will be accessible at http://127.0.0.1:5000 in your web browser.
+
+
+
+

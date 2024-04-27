@@ -41,6 +41,16 @@ CREATE TABLE users (
     hash TEXT NOT NULL
 );
 ```
+To create the faceswapper.db file and initialize the database, you can use a SQLite client or a Python script. For simplicity, here's how you can do it in Python:
+```
+import sqlite3
+
+conn = sqlite3.connect('faceswapper.db')
+c = conn.cursor()
+c.execute('''CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, username TEXT NOT NULL, hash TEXT NOT NULL);''')
+conn.commit()
+conn.close()
+```
 ## Running the Application
 
 ### Activate the Virtual Environment
@@ -57,7 +67,3 @@ With the virtual environment activated and dependencies installed, you can start
 flask run
 ```
 The application will be accessible at http://127.0.0.1:5000 in your web browser.
-
-
-
-

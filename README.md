@@ -1,6 +1,6 @@
-# Face Swapper
-
-## Project Overview
+# FACESWAPPER
+#### Video Demo:  https://youtu.be/k8Un5c14OEY
+#### Description:
 Face Swapper is an interactive application designed to manipulate images by swapping faces between them. Using the open-source library `inswapper_128.onnx`, the application can detect multiple faces in a picture. 
 Users can upload a target image (the destination picture) and another one containing the source face. They can then choose whose face will be replaced by whose, resulting in fun, creative, and often intriguing transformations. Both real photos and AI-generated images can be used seamlessly. Even if there are multiple people in the target image, the application handles it with ease by listing all recognized faces, allowing users to select their preferred one for swapping.
 

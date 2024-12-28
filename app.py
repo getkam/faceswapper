@@ -1,10 +1,7 @@
 from datetime import timedelta
-from flask import Flask, flash, redirect, render_template, request, session, sessions
-import numpy as np
+from flask import Flask, flash, redirect, render_template, request, session
 import os
-import glob
 import cv2
-import matplotlib.pyplot as plt
 from jinja2 import Environment
 import helper
 from helper import login_required
@@ -22,7 +19,7 @@ app = Flask(__name__)
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=2)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=15)
 app.secret_key = "super secret key"
 Session(app)
 
@@ -32,10 +29,14 @@ app.jinja_env.globals.update(enumerate=enumerate)
 face_analysis = FaceAnalysis(name='buffalo_l')
 face_analysis.prepare(ctx_id=0, det_size=(640,640))
 
+
 @app.route('/')
 def index():
-    session.clear()
-    return render_template('index.html')
+    if "user_id" in session: 
+        return render_template('index.html')
+    else:
+        return redirect('/welcome')
+    
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -49,28 +50,29 @@ def login():
         username = request.form.get("username")
         # Ensure username was submitted
         if not username:
-            return render_template("apology.html", message="User name must be provided")
+            return render_template("login.html", error="User name must be provided")
 
         # Ensure password was submitted
         elif not request.form.get("password"):
-            return render_template("apology.html", message="Password must be provided")
+            return render_template("login.html", error="Password must be provided")
+        
         with sqlite3.connect('faceswapper.db') as conn:
-            # Ustawienie row_factory na sqlite3.Row
+            # Set row_factory na sqlite3.Row
             conn.row_factory = sqlite3.Row  
             db = conn.cursor()
             # Query database for username
             row = db.execute("SELECT id, hash FROM users WHERE username = ?", [username]).fetchone()
             # Ensure username exists and password is correct
             if row is None:
-                return render_template("apology.html", message="Invalid username. Please try again.")
+                return render_template("login.html", error="Invalid username. Please try again.")
             provided_password = request.form.get("password").encode('utf-8')
             hashed_password = row["hash"]
             if not bcrypt.checkpw(provided_password, hashed_password):
-                return render_template("apology.html", message="Invalid password. Please try again.")
+                return render_template("login.html", error="Invalid password. Please try again.")
 
             # Remember which user has logged in
             session["user_id"] = row["id"]
-
+            session.permanent = True
             # Redirect user to home page
             return redirect("/")
 
@@ -87,18 +89,18 @@ def signup():
         username = request.form.get("username")
         print(username)
         if not username:
-            return render_template("apology.html", message="Username must be provided")
+            return render_template("signup.html", error="Username must be provided")
         userDB = db.execute("SELECT * FROM users WHERE username = ?", [username]).fetchall()
         if len(userDB) != 0:
-            return render_template("apology.html", message="Username already exists")
+            return render_template("signup.html", error="Username already exists")
 
         password = request.form.get("password")
         if len(password) < 5 or not re.search(r"[a-z]", password) or not re.search(r"[\d]", password):
-            return render_template("apology.html", message="Password must be at least 5 characters long and contain at least one number and one letter")
+            return render_template("signup.html", error="Password must be at least 5 characters long and contain at least one number and one letter")
 
         confirmation = request.form.get("confirmation")
         if password != confirmation:
-            return render_template("apology.html", message="Passwords do not match")
+            return render_template("signup.html", error="Passwords do not match")
         password_bytes = password.encode('utf-8')
         print(password_bytes)
         hashed = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
@@ -114,12 +116,12 @@ def signup():
 @login_required
 def logout():
     """Log user out"""
-
+    clear()
     # Forget any user_id
     session.clear()
 
     # Redirect user to login form
-    return redirect("/")
+    return render_template("login.html", error="You have been successfully log out. All your data has been removed")
 
 
 @app.route('/upload', methods=['POST'])
@@ -128,14 +130,18 @@ def upload():
   if request.method == "POST":
 
     # Recognize which picture is being uploaded
-    if 'target' in request.files or 'source' in request.files:
+    if 'target' in request.files or 'source' in request.files or 'biometric' in request.files:
       if 'target' in request.files:
           type = 'target'
       elif 'source' in request.files:
           type = 'source'
+      elif 'biometric' in request.files:
+          type = 'biometric'
 
       # Check if the file is an image 
       if not helper.isImage(request.files[type].filename):
+        if type == 'biometric':
+            return render_template('biometric.html',error="Please upload an image file")
         return render_template('index.html',error="Please upload an image file")
       
       # Save the file
@@ -153,7 +159,9 @@ def upload():
       
       # Check if any faces were detected
       if len(faces) == 0:
-          return render_template('index.html',error="No faces detected in the image")
+        if type == 'biometric':
+            return render_template('biometric.html',error="No faces detected in the image")
+        return render_template('index.html',error="No faces detected in the image")
       
       # Organize recognized faces in a list
       recognized_faces = []
@@ -172,10 +180,16 @@ def upload():
       session[type+'_faces'] = recognized_faces
 
       # no need to pass pictures, everything is in the session
+      if type == 'biometric': 
+          return redirect('/biometric')
       return render_template('index.html')
     else:
+        if type == 'biometric': 
+          return render_template('biometric.html', error="Please upload an image file")
         return render_template('index.html', error="Please upload an image file")
   else:
+      if type == 'biometric': 
+          return redirect('/biometric')
       return render_template('index.html')
 
 
@@ -216,6 +230,33 @@ def swap():
    else:
       return render_template('index.html')
    
+@app.route('/biodata', methods=['POST'])
+@login_required
+def biodata():
+   if request.method == "POST":
+      if 'biometric_img' in session:
+         # Use the model to swap the faces
+         swapper = insightface.model_zoo.get_model('inswapper_128.onnx', download=False, download_zip=False)
+
+         # Load the images
+         original_file= cv2.imread(session.get('biometric_img'))
+         
+
+         # Recognize the faces in the images
+         faces = face_analysis.get(original_file)
+         
+         selected_face_idx=int(request.form.get('selected_biometric_face'))
+        
+         session["selected_bio_face_idx"]=selected_face_idx
+         age = faces[selected_face_idx]['age']
+         
+         # Render the result page
+         return render_template('biometric.html', age = age )
+      else:
+        return render_template('biometric.html', error="Please upload an image file")
+   else:
+      return render_template('biometric.html')
+     
 
 @app.route('/clear', methods=['POST'])
 @login_required
@@ -225,14 +266,31 @@ def clear():
         os.remove(session.get('target_img'))
     if 'source_img' in session:
         os.remove(session.get('source_img'))
+    if 'biometric_img' in session:
+        os.remove(session.get('biometric_img'))
     if 'target_faces' in session:
         for face in session.get('target_faces'):
             os.remove(face)
     if 'source_faces' in session:
         for face in session.get('source_faces'):
             os.remove(face)
+    if 'biometric_faces' in session:
+        for face in session.get('biometric_faces'):
+            os.remove(face)
     if 'result_img' in session:
         os.remove(session.get('result_img'))
     
+    userid = session.get("user_id")
     session.clear()
-    return render_template('index.html')
+    session["user_id"]=userid
+
+    return render_template('index.html', error="All uploaded files has been deleted")
+
+@app.route('/welcome')
+def welcome():
+    return render_template('welcome.html')
+
+@app.route('/biometric',methods=["GET", "POST"])
+@login_required
+def biometric():
+    return render_template('biometric.html')

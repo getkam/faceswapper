@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Face swapper
+{% endblock %}
+{% block main %}
+<div class="grid-container-one">
+  <div class="grid-item">
+    <h5 class="text-center">Estimate your age</h5>
+    <p>Upload your picture to check on how old you look like. Picture can contain many people - it possible to select person after upload. Do not take it too seriously - calculation can be affected by light, makeup etc.</p>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="biometric" id="biometric-file" class="d-none" onchange="uploadFile(this)" accept="image/jpg image/png"/> 
+        <label for="biometric-file" class="custom-file-upload"> Upload Picture </label>
+    </form>
+  </div>
+</div>
+
+<div class="grid-container-one">
+  {% if session.get('biometric_img') %}
+  <div class="grid-item">
+    <h5>Preview of picture</h5>
+    {% if session.get('biometric_img') %}
+    <img src="{{ session.get('biometric_img') }}" id="biometric_preview" alt="Preview of image">
+    {% endif %}
+  </div>
+  <div class="grid-item">
+    <h5>Recognized faces from picture</h5>
+    {% if session.get('biometric_faces') %}
+    <p>Select face to display biometric data</p>
+    <div class="flex-container">
+      {% set selected_idx = session.get('selected_bio_face_idx', 0) %}
+      {% for idx, face in enumerate(session.get('biometric_faces')) %}
+      <img src='{{ face }}' alt='Face' onclick="selectItem(this)" class="biometric-face {% if idx == selected_idx%}selected-img{%endif%}" data-value="{{ idx }}">
+      {% endfor %}
+    </div>
+    {% else %}
+    <p>No faces found</p>
+    {% endif %}
+  </div>
+  {% if session.get('biometric_faces') %}
+  <form id="biodata" action="/biodata" method="post">
+    <br/>
+    <div class="container text-center">
+      <input type="hidden" name="selected_biometric_face" id="selected_biometric_face" value="0">
+      <button class="btn btn-primary w-50" type="submit" form="biodata" value="Submit">Check</button>
+    </div>
+  </form>
+{% endif %}
+{% if age %}
+<div class="grid-container-one"> 
+    <h4>Estimated age of the person from the photo</h4>
+    <br/>
+    <h1>{{ age }}</h1>
+</div>
+{%endif%}
+</div>
+
+{% endif %}
+{% endblock %}

@@ -14,6 +14,9 @@ function selectItem(selectedImg){
   if(selectedImg.classList.contains('source-face')){
     document.getElementById('selected_source_face').value = selectedImg.getAttribute('data-value');
   }
+  if(selectedImg.classList.contains('biometric-face')){
+    document.getElementById('selected_biometric_face').value = selectedImg.getAttribute('data-value');
+  }
 }
 
 function uploadFile(element){

@@ -43,7 +43,7 @@ sqlite3 faceswapper.db
 Once inside, check if the table users is created correctly:
 ```
 .schema
-```
+``
 You should see following
 ```
 sqlite> .schema

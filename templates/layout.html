@@ -9,33 +9,44 @@
     <title>{{ title }}</title>
   </head>
   <body>
-    <header class="p-3 bg-dark text-white">
+    <header class="p-3">
       <div class="container">
-        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+        <div class="d-flex align-items-center justify-content-between">
           <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-            <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"></use></svg>
+            <h1 class="fs-3 fw-bold m-0 text-white">Faceswapper  </h1>
           </a>
+          
           {% if session["user_id"] %}   
           <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-            <li><a href="/swap" class="nav-link px-2 text-secondary">SWAP</a></li>
-            <li><a href="/biometric" class="nav-link px-2 text-white">BIO</a></li>
+            <li><a href="/" class="btn me-2">SWAP FACES</a></li>
+            <li><a href="/biometric" class="btn me-2">CHECK AGE</a></li>
+            <li>
+              <form id="clear" action="/clear" method="post">
+                <button class="btn btn-primary me-2" type="submit">CLEAR MY DATA</button>
+              </form>
+            </li>
           </ul>
-          <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
             <a type="button" class="btn btn-outline-light me-2" href="/logout">LOG OUT</a>
-          </form>
     
           {%else%}
     
           <div class="text-end">
             <a type="button" class="btn btn-outline-light me-2" href="/login">LOG IN</a>
-            <a type="button" class="btn btn-warning" href="/signup">SIGN UP</a>
+            <a type="button" class="btn btn-light" href="/signup">SIGN UP</a>
           </div>
           {%endif%}
         </div>
       </div>
     </header>
     <div class="container">
-      {% block main %}{% endblock %}
+      {% if error %}
+        <div class="alert alert-warning" role="alert">
+          {{ error }}
+        </div>
+      {% endif %}
+      {% block main %}
+      {% endblock %}
     </div>
+    <br/>
     <script src="static/scripts.js"></script>
   </body>

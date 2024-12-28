@@ -5,17 +5,11 @@
 {% endblock %}
 
 {% block main %}
-<div class="container">
-    <div class="row">
-        <div class="col-12">
-            <div class="alert alert-danger" id="error" role="alert" style="display: none;">
-                <strong>Error!</strong> <span id="error-message"></span>
-            </div>
-        </div>
-    </div>
+
+<div class="container-box">
     <form action="/signup" method="post">
         <div class="mb-3">
-            <h1 class="display-4">Register</h1>
+            <h1 class="text-center">Register</h1>
             <br/>
         </div>
     <div class="mb-3">
@@ -27,9 +21,9 @@
     <div class="mb-3">
         <input class="form-control mx-auto w-auto" name="confirmation" id="confirmation" placeholder="Confirm password" type="password" onblur="checkIfPasswordsAreMatching()">
     </div>
-    <div class="mb-3">
-        <button class="btn btn-primary" type="submit">Sign up</button>
-    </div>
+    <div class="text-center">
+        <button class="btn btn-primary w-auto" type="submit">Sign up</button>
+      </div>
     
     </form>
 </div>

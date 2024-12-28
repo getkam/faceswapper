@@ -1,7 +1,7 @@
 # Face Swapper
 
 ## Project Overview
-Face Swapper is an interactive application designed to manipulate images by swapping faces between them. Using the open-source library `inswapper_128.onnx`, the application can detect multiple faces in a picture. Users can select which faces to swap, creating fun and intriguing results. Registered users can have additional features, including the ability to detect biometric data from images. All passwords are securely hashed to ensure privacy and security.
+Face Swapper is an interactive application designed to manipulate images by swapping faces between them. Using the open-source library `inswapper_128.onnx`, the application can detect multiple faces in a picture. Users can select which faces to swap, creating fun and intriguing results. Features or faceswapping and estimation of the age are available only for registered users. All passwords are securely hashed to ensure privacy and security.
 
 ## Installation
 
@@ -43,7 +43,7 @@ sqlite3 faceswapper.db
 Once inside, check if the table users is created correctly:
 ```
 .schema
-``
+```
 You should see following
 ```
 sqlite> .schema
@@ -62,9 +62,10 @@ To isolate our package dependencies locally, create a virtual environment:
 ```
 python -m venv venv
 source venv/bin/activate  
-# On Windows use `venv\Scripts\activate`
+# On Windows use
+```venv\Scripts\activate
 ```
-f you wish to exit the virtual environment, simply type the following command:
+If you wish to exit the virtual environment, simply type the following command:
 ```
 deactivate
 ```

@@ -1,21 +1,23 @@
 # Face Swapper
 
 ## Project Overview
-Face Swapper is an interactive application designed to manipulate images by swapping faces between them. Using the open-source library `inswapper_128.onnx`, the application can detect multiple faces in a picture. Users can select which faces to swap, creating fun and intriguing results. Features or faceswapping and estimation of the age are available only for registered users. All passwords are securely hashed to ensure privacy and security.
+Face Swapper is an interactive application designed to manipulate images by swapping faces between them. Using the open-source library `inswapper_128.onnx`, the application can detect multiple faces in a picture. 
+Users can upload a target image (the destination picture) and another one containing the source face. They can then choose whose face will be replaced by whose, resulting in fun, creative, and often intriguing transformations. Both real photos and AI-generated images can be used seamlessly. Even if there are multiple people in the target image, the application handles it with ease by listing all recognized faces, allowing users to select their preferred one for swapping.
 
-## Installation
+Additionally, the application offers a feature to estimate the age of a person from a photo. Curious to see how old you look? Try it out—but don't take the results too seriously, as it's all just for fun!
 
+The face-swapping and age-estimation features are available exclusively to registered users. For privacy and security, all user passwords are securely hashed, ensuring your personal data remains safe.
 ### Prerequisites
 - Python 3.8 or higher
 - Flask
 - SQLite
 
 ### Set up Python Environment
-First, ensure you have Python installed. If not, download and install it from [python.org](https://www.python.org/).
+If Python is not already installed on your system, you can download it from the official Python website: [python.org](https://www.python.org/). Follow the installation instructions for your operating system to ensure everything is set up correctly. 
 
 ### Clone the Repository
 To get started, clone the project repository to your local machine:
-```bash
+```
 git clone https://github.com/yourusername/faceswapper.git
 ```
 Navigate to the project directory:
@@ -51,14 +53,14 @@ CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, username TEXT
 ```
 
 ### Dowloading inswapper_128.onnx
-This library weighs around 500 MB, so it could not be attached to this repository. However, this open-source library is available for download here: https://github.com/deepinsight/insightface/issues/2335
+The inswapper_128.onnx library is an essential component of the application. Since this file is approximately 500 MB in size, it is not included in the project repository. You can download it from the official source here: https://github.com/deepinsight/insightface/issues/2335.
 
-Place the downloaded file in the project folder.
+Once downloaded, place the file in the project folder to ensure the application can access it.
 
 ## Running the Application
 
 ### Activate the Virtual Environment
-To isolate our package dependencies locally, create a virtual environment:
+It is recommended to use a virtual environment to isolate the package dependencies for this project. To create and activate a virtual environment, run the following commands:
 ```
 python -m venv venv
 source venv/bin/activate  
@@ -71,9 +73,12 @@ deactivate
 ```
 
 ### Start the Flask Application
-With the virtual environment activated and dependencies installed, you can start the Flask application:
+With the virtual environment activated and all dependencies installed, you’re ready to start the Flask application. Run the following command in your terminal:
 
 ```
 flask run
 ```
-The application will be accessible at http://127.0.0.1:5000 in your web browser.
+The application will launch, and you can access it in your web browser at http://127.0.0.1:5000.
+
+### Summary
+Face Swapper is a tool designed for creativity and fun, allowing users to experiment with face-swapping and age-estimation features. 
